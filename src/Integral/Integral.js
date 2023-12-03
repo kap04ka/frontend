@@ -2,110 +2,107 @@ import React from "react";
 import './Integral.css';
 import ResList from "../ResList/ResList";
 import Plot from 'react-plotly.js';
+import { useState } from 'react';
 
 import axios from "axios";
 
+function Integral(){
+    const [down, setLowerLimit] = useState(0.0);
+    const [up, setUpperLimit] = useState(1.0);
+    const [splits, setSplits] = useState(1000);
+    const [resultList, setResList] = useState([]);
+    const [x, setXArray] = useState([]);
+    const [y, setYArray] = useState([]);
+    const [underIntegralFunction, setFunc] = useState('x');
 
-export default class Integral extends React.Component {
-
-
-    constructor(props){
-        super(props);
-        this.state = {
-            up: 1,
-            down: 0, 
-            splits: 1000, 
-            resultList: [], 
-            x: [],
-            y: [],
-            underIntegralFunc: 'x'
-        };
-
-        this.calculate = this.calculate.bind(this);
-        this.clearArea = this.clearArea.bind(this);
+    function clearArea(){
+        setResList([]);
+        setLowerLimit(0.0);
+        setUpperLimit(1.0);
+        setSplits(1000);
+        setFunc('x');
+        setXArray([]);
+        setYArray([]);
     }
 
-    clearArea(){
-        let array = [];
-        this.setState({resultList: array})
-    }
-
-    deleteHandler(index){
-        const results = this.state.resultList.concat();
-        results.splice(index, 1);
+    function deleteHandler(index){
         console.log(index);
-
-        this.setState({resultList: results})
-        console.log(this.state.resultList);
-
+        const results = [...resultList];
+        results.splice(index, 1);
+        setResList(results); 
     }
 
-    calculate(e){
+    function calculate(e){
+        if(splits <= 0) {
+            alert('Incorrect data');
+            return;
+        }
+
         const apiUrl = process.env.REACT_APP_API_URL + 'api/integral';
         console.log("TAHTS API URL", apiUrl);
         axios({
             method: 'post',
             url: apiUrl,
             data: {
-                downLimit: this.state.down,
-                upLimit: this.state.up,
-                n: this.state.splits,
-                funcIntegral: this.state.underIntegralFunc
+                downLimit: down,
+                upLimit: up,
+                n: splits,
+                funcIntegral: underIntegralFunction
             }
         }).then(response => {
-             this.setState({x: response.data.x});
-             this.setState({y: response.data.y});
-             this.setState({resultList: this.state.resultList.concat({value: response.data.result})});
+            setXArray(response.data.x);
+            setYArray(response.data.y);
+            const newReslist = [...resultList].concat(response.data.result);
+            setResList(newReslist);
         })
-        
-       
     }
 
-    render() {
-
-
-        return <div> 
+    return(
+        <div> 
             <Plot
                 data={[
                 {
-                    x: this.state.x,
-                    y: this.state.y,
+                    x: x,
+                    y: y,
                     type: 'scatter',
                     mode: 'lines',
                     marker: {color: 'red'},
                 },
                 ]}
-                layout={{ width: 600, height: 400, title: 'Graph of ' + this.state.underIntegralFunc }}
+                layout={{ width: 600, height: 400, title: 'Graph of ' + underIntegralFunction }}
             />
-            <p>Вычисление интеграла ∫{this.state.underIntegralFunc}dx</p>
-            <p>Верхний предел: <input type="number" value={this.up} defaultValue={1} onChange={e => this.setState({up: e.target.value})}/></p>
-            <p>Нижний предел: <input type="number" value={this.down} defaultValue={0} onChange={e => this.setState({down: e.target.value})}/></p>
-            <p>Число разбиений: <input type="number" value={this.splits} defaultValue={1000} onChange={e => this.setState({splits: e.target.value})}/></p>
-            <p>Подитнегральная функция: <input type="text" value={this.underIntegralFunc} defaultValue={'x'} onChange={e => this.setState({underIntegralFunc: e.target.value})}/></p>
-            <div className="container-buttons"> 
-                <button onClick={this.calculate}>Рассчитать</button>
-                <button onClick={this.clearArea}>Очистить все</button>
+
+        <p>Вычисление интеграла ∫{underIntegralFunction}dx</p>
+        <p>Верхний предел: <input type="number" value={up} defaultValue={1} onChange={e => setUpperLimit(e.target.value)}/></p>
+        <p>Нижний предел: <input type="number" value={down} defaultValue={0} onChange={e => setLowerLimit(e.target.value)}/></p>
+        <p>Число разбиений: <input type="number" value={splits} defaultValue={1000} onChange={e => setSplits(e.target.value)}/></p>
+        <p>Подитнегральная функция: <input type="text" value={underIntegralFunction} defaultValue={'x'} onChange={e => setFunc(e.target.value)}/></p>
+        <div className="container-buttons"> 
+            <button onClick={calculate}>Рассчитать</button>
+            <button onClick={clearArea}>Очистить все</button>
                 
-            </div>
+        </div>
             
-            { 
-                this.state.resultList.map((item, index) => { 
-                    let isActive = "off";
-                    if(index === this.state.resultList.length - 1){
-                        isActive = "on";
-                    }
-                    return(
+        { 
+            resultList.map((item, index) => { 
+                let isActive = "off";
+                if(index === resultList.length - 1){
+                    isActive = "on";
+                }
+                return(
                     <ResList
                         divClass = {isActive}
                         key={index}
-                        value={item.value}
-                        onDelete={this.deleteHandler.bind(this, index)}
+                        value={item}
+                        onDelete={() => deleteHandler(index)}
                     />
-                    )
+                )
 
-                })
-            }
+            })
+        }
 
         </div>
-    }
+    );
 }
+
+export default Integral;

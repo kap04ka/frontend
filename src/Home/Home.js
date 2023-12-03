@@ -1,10 +1,11 @@
 import React from "react";
 
-export default class Home extends React.Component {
-    render() {
-        return <div>
-                <h1>Welcome to integral calculator</h1>
-            </div>
-        
-    }
+function Home(){
+
+    return (
+        <div>
+            <h1>Welcome to integral calculator</h1>
+        </div>
+    )
 }
+export default Home;

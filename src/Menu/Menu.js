@@ -14,21 +14,18 @@ function Nav(){
     </nav>;
 }
 
-export default class Menu extends React.Component {
-
-    render() {
-        return(
+function Menu(){
+    return(
             
-            <div>
-                <Nav />
-                <Routes>
-                    <Route path="/" element={<Home />}/>
-                    <Route path="/info" element={<Info />}/>
-                    <Route path="/integral" element={<Integral />}/>
-                </Routes>
-            </div>
-            
-        );
-    }
+        <div>
+            <Nav />
+            <Routes>
+                <Route path="/" element={<Home />}/>
+                <Route path="/info" element={<Info />}/>
+                <Route path="/integral" element={<Integral />}/>
+            </Routes>
+        </div>
+        
+    );
 }
-
+export default Menu;

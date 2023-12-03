@@ -8,6 +8,8 @@ services:
       - "5020:80"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+    networks:
+      - backend_network
 
   front:
     image: kap04ka/front
@@ -16,4 +18,9 @@ services:
     depends_on:
       - backend
     environment:
-      REACT_APP_API_URL: "http://localhost:5020/"
+      REACT_APP_API_URL: "http://backend:5020/"
+    networks:
+      - backend_network
+
+networks:
+  backend_network:
