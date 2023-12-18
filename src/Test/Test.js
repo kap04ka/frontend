@@ -35,6 +35,12 @@ function Test(){
 
     }
 
+    const getMark = (result) => {
+        var mark = result / questionsCount;
+
+        return Math.round(mark * 5.0);
+    }
+
     const selectChoice = (index) => {
 
         if((index + 1) == questionsArray[currentQuestion].rightAnswer){
@@ -45,7 +51,7 @@ function Test(){
             setQuestionIndex(currentQuestion + 1);
 
         else {
-            alert(`Конец теста, ваш результат: ${result} из ${questionsCount}`);
+            alert(`Конец теста, вы ответили на: ${result} из ${questionsCount} вопросов\n Ваша оценка: ${getMark(result)}`);
             setQuestions([]);
             setQstCount(1);
             setQuestionIndex(0);
