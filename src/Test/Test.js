@@ -10,7 +10,6 @@ function Test(){
     const [questionsArray, setQuestions] = useState([]);
     const [currentQuestion, setQuestionIndex] = useState(0);
     const [result, setResult] = useState(0);
-    const navigate = useNavigate()
     const [selectedAnswer, setSelectedAnswer] = useState(null);
 
     function setQuestionsCount(e){
@@ -27,7 +26,7 @@ function Test(){
         console.log("TAHTS API URL", apiUrl);
 
         axios({
-            method: 'post',
+            method: 'get',
             url: apiUrl,
         }).then(response => {
             setQuestions(response.data);
@@ -51,14 +50,12 @@ function Test(){
             setQuestionIndex(currentQuestion + 1);
 
         else {
-            alert(`Конец теста, вы ответили на: ${result} из ${questionsCount} вопросов\n Ваша оценка: ${getMark(result)}`);
+            alert(`Конец теста, вы ответили на: ${result} из ${questionsCount} вопросов\nВаша оценка: ${getMark(result)}`);
             setQuestions([]);
             setQstCount(1);
             setQuestionIndex(0);
             setResult(0);
         }
-        
-
     }
 
     return (
@@ -78,7 +75,6 @@ function Test(){
                                 <button 
                                     key={index}
                                     className={`btn`}
-                                    disabled={selectedAnswer !== null}
                                     onClick={() => selectChoice(index)}
                                 >
                                 {answer}
